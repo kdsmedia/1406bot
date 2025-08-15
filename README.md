@@ -76,7 +76,7 @@ Setiap donasi sangat berarti untuk menjaga proyek ini tetap hidup dan terus berk
 
 Terima kasih kepada para sponsor yang telah mendukung proyek ini!
 
-*(Bagian ini dapat diisi dengan logo atau nama sponsor Anda)*
+![Header](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjH6ugvQY59wpkduNt1I5okR9uMHWahNn7yVfHaaU2-V4MjPgDnE2CRT-Dp0Omgwd83M60sL5fWvsOx7VLHzRdfOPObLzIZZaZJJxqI1IVcugWSlOaWVXrlByyBSBQZFrAEzyLyc90NbZpnEmiQpTNwU6gnvTj9wK-qfsqURUfOdYwcLRLP-jRZoSilVQ/s1024/ALTOMEDIA-6-8-2025.png) <!-- Ganti dengan URL gambar header Anda -->
 
 Ingin menjadi sponsor? [Hubungi kami!](mailto:altomediaindonesia@gmail.com)
 
