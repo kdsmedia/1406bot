@@ -2,6 +2,16 @@
 //              BOT WHATSAPP CANGGIH V1.0 - FINAL                  //
 // ================================================================= //
 
+
+// --- IMPOR PUPPETEER ---
+const client = new Client({
+    authStrategy: new LocalAuth(),
+    puppeteer: {
+        executablePath: '/usr/bin/chromium-browser',
+        args: ['--no-sanbox', '--disable-setuid-sanbox', '--disable-dev-shm-usage']
+    }
+});
+
 // --- IMPORTS LIBRARY ---
 const fs = require('fs');
 const { Client, LocalAuth, MessageMedia, List } = require('whatsapp-web.js');
