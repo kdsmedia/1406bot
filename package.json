@@ -1,16 +1,17 @@
 {
-  "name": "ALTOSHOPBOT",
+  "name": "ALTO",
   "version": "1.0.0",
   "description": "Bot WhatsApp multifungsi dengan Olshop, AI, dan fitur canggih lainnya.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "author": "Anda & Gemini AI",
+  "author": "ALTOMEDIA & SIDHANIE",
   "license": "ISC",
   "dependencies": {
-    "@google/generative-ai": "^0.1.3",
+    "@google/generative-ai": "^0.14.0",
     "axios": "^1.6.2",
+    "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.23.0"
   }
 }
