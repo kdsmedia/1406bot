@@ -164,7 +164,7 @@ Berikut adalah panduan instalasi detail untuk tiga platform berbeda.
 2.  **Install Git & Node.js:**
     ```bash
     sudo apt install git -y
-    curl -sL [https://deb.nodesource.com/setup_18.x](https://deb.nodesource.com/setup_18.x) | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
     sudo apt install nodejs -y
     ```
 3.  **Kloning Repositori:**
