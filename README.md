@@ -1,17 +1,17 @@
-# ALTOS - Bot WhatsApp Canggih V1.0
+# ALTO - Bot WhatsApp Canggih V1.0
 ### _Sebuah Proyek dari ALTOMEDIA_
 
-![Header](https://i.imgur.com/your-header-image.png) <!-- Ganti dengan URL gambar header Anda -->
+![Header]([https://i.imgur.com/your-header-image.png](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjH6ugvQY59wpkduNt1I5okR9uMHWahNn7yVfHaaU2-V4MjPgDnE2CRT-Dp0Omgwd83M60sL5fWvsOx7VLHzRdfOPObLzIZZaZJJxqI1IVcugWSlOaWVXrlByyBSBQZFrAEzyLyc90NbZpnEmiQpTNwU6gnvTj9wK-qfsqURUfOdYwcLRLP-jRZoSilVQ/s1024/ALTOMEDIA-6-8-2025.png)) <!-- Ganti dengan URL gambar header Anda -->
 
-ALTOS adalah sebuah bot WhatsApp multifungsi yang dirancang untuk mengotomatisasi berbagai tugas, mulai dari toko online interaktif hingga asisten AI pribadi. Ditenagai oleh **whatsapp-web.js** dan **Google Gemini AI**, bot ini siap melayani pengguna 24/7 dengan berbagai fitur canggih.
+ALTO adalah sebuah bot WhatsApp multifungsi yang dirancang untuk mengotomatisasi berbagai tugas, mulai dari toko online interaktif hingga asisten AI pribadi. Ditenagai oleh **whatsapp-web.js** dan **Google Gemini AI**, bot ini siap melayani pengguna 24/7 dengan berbagai fitur canggih.
 
 <p align="center">
-  <a href="https://wa.me/6281234567890?text=!start" target="_blank">
+  <a href="https://wa.me/6283872543697?text=!start" target="_blank">
     <img src="https://img.shields.io/badge/Coba%20Live%20Demo-%2325D366.svg?style=for-the-badge&logo=WhatsApp&logoColor=white" alt="Coba Live Demo di WhatsApp"/>
   </a>
 </p>
 <p align="center">
-  <em>*(Ganti <code>6281234567890</code> dengan nomor WhatsApp bot Anda)*</em>
+  
 </p>
 
 
@@ -54,21 +54,21 @@ Jika Anda merasa proyek ini bermanfaat, Anda dapat mendukung pengembangan lebih 
 
 **Ikuti Kami di Media Sosial:**
 <p align="left">
-  <a href="https://youtube.com/YOUR_CHANNEL_LINK" target="_blank"><img src="https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white" alt="YouTube"/></a>
-  <a href="https://facebook.com/YOUR_PAGE_LINK" target="_blank"><img src="https://img.shields.io/badge/Facebook-%231877F2.svg?style=for-the-badge&logo=Facebook&logoColor=white" alt="Facebook"/></a>
-  <a href="https://tiktok.com/@YOUR_USERNAME" target="_blank"><img src="https://img.shields.io/badge/TikTok-%23000000.svg?style=for-the-badge&logo=tiktok&logoColor=white" alt="TikTok"/></a>
-  <a href="https://your-website.com" target="_blank"><img src="https://img.shields.io/badge/Website-000000?style=for-the-badge&logo=world&logoColor=white" alt="Website"/></a>
+  <a href="https://youtube.com/@sidhanie06" target="_blank"><img src="https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white" alt="YouTube"/></a>
+  <a href="https://facebook.com/sidhanie06" target="_blank"><img src="https://img.shields.io/badge/Facebook-%231877F2.svg?style=for-the-badge&logo=Facebook&logoColor=white" alt="Facebook"/></a>
+  <a href="https://tiktok.com/@sidhanie" target="_blank"><img src="https://img.shields.io/badge/TikTok-%23000000.svg?style=for-the-badge&logo=tiktok&logoColor=white" alt="TikTok"/></a>
+  <a href="https://sidhanie.my.id" target="_blank"><img src="https://img.shields.io/badge/Website-000000?style=for-the-badge&logo=world&logoColor=white" alt="Website"/></a>
 </p>
 
 **Donasi:**
 Setiap donasi sangat berarti untuk menjaga proyek ini tetap hidup dan terus berkembang.
 
-<a href="https://paypal.me/YOUR_PAYPAL_USERNAME" target="_blank">
+<a href="https://paypal.me/sidhanie" target="_blank">
   <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal" />
 </a>
 
 **DANA (QRIS):**
-![DANA QRIS](https://i.imgur.com/your-qris.jpg) <!-- Ganti dengan URL gambar QRIS DANA Anda -->
+![DANA QRIS]([https://i.imgur.com/your-qris.jpg](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHwO_-Mp4mmE5tIQgvrs8ZzsUiKwMWROUa8XAMFdKpYGzqxAXR9ciCYRZ9LBt-i1ukxzhTVQw_mcKbCm5jzFe6vySjmowjplpTMJBwV5HVfETSH6WwqlWHY2BEn_rMJn4jXXRX5ylMRwDGPssCFolj5akwy1Ny-Y3_JHFQZK3Jdf4HzaFwuBRXqwcDVhI/s407/qris.jpg)) <!-- Ganti dengan URL gambar QRIS DANA Anda -->
 
 ---
 
@@ -78,7 +78,7 @@ Terima kasih kepada para sponsor yang telah mendukung proyek ini!
 
 *(Bagian ini dapat diisi dengan logo atau nama sponsor Anda)*
 
-Ingin menjadi sponsor? [Hubungi kami!](mailto:emailanda@example.com)
+Ingin menjadi sponsor? [Hubungi kami!](mailto:altomediaindonesia@gmail.com)
 
 ---
 
@@ -113,12 +113,12 @@ Berikut adalah panduan instalasi detail untuk tiga platform berbeda.
     ```
 3.  **Kloning Repositori:**
     ```bash
-    git clone [https://github.com/USERNAME/NAMA-REPOSITORI.git](https://github.com/USERNAME/NAMA-REPOSITORI.git)
+    git clone [https://github.com/kdsmedia/1406bot.git](https://github.com/kdsmedia/1406bot.git)
     ```
-    *(Ganti `USERNAME` dan `NAMA-REPOSITORI` dengan milik Anda)*
+    *(Ganti `kdsmedia` dan `1406bot` dengan milik Anda)*
 4.  **Masuk ke Direktori Proyek:**
     ```bash
-    cd NAMA-REPOSITORI
+    cd 1406bot
     ```
 5.  **Install Dependensi:**
     ```bash
@@ -139,11 +139,11 @@ Berikut adalah panduan instalasi detail untuk tiga platform berbeda.
     * Tekan `Win + R`, ketik `cmd`, lalu tekan Enter.
 3.  **Kloning Repositori:**
     ```bash
-    git clone [https://github.com/USERNAME/NAMA-REPOSITORI.git](https://github.com/USERNAME/NAMA-REPOSITORI.git)
+    git clone [https://github.com/kdsmedia/1406bot.git](https://github.com/kdsmedia/1406bot.git)
     ```
 4.  **Masuk ke Direktori Proyek:**
     ```bash
-    cd NAMA-REPOSITORI
+    cd 1406bot
     ```
 5.  **Install Dependensi:**
     ```bash
@@ -169,11 +169,11 @@ Berikut adalah panduan instalasi detail untuk tiga platform berbeda.
     ```
 3.  **Kloning Repositori:**
     ```bash
-    git clone [https://github.com/USERNAME/NAMA-REPOSITORI.git](https://github.com/USERNAME/NAMA-REPOSITORI.git)
+    git clone [https://github.com/kdsmedia/1406bot.git](https://github.com/kdsmedia/1406bot.git)
     ```
 4.  **Masuk ke Direktori Proyek & Install Dependensi:**
     ```bash
-    cd NAMA-REPOSITORI
+    cd 1406bot
     npm install
     ```
 5.  **Jalankan Bot 24/7 dengan PM2:**
