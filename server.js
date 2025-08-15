@@ -9,15 +9,15 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const axios = require('axios');
 
 // --- KONFIGURASI PENTING (WAJIB DIISI!) ---
-const ADMIN_WID = 'GANTI_DENGAN_NOMOR_WHATSAPP_ADMIN@c.us';
-const QRIS_IMAGE_URL = 'GANTI_DENGAN_URL_GAMBAR_QRIS_ANDA';
-const RAJAONGKIR_API_KEY = 'GANTI_DENGAN_API_KEY_RAJAONGKIR_ANDA';
-const SHOP_ORIGIN_SUBDISTRICT_ID = 'GANTI_DENGAN_ID_KECAMATAN_ANDA';
-const GEMINI_API_KEY = 'GANTI_DENGAN_API_KEY_GEMINI_ANDA';
+const ADMIN_WID = '6285813899649';
+const QRIS_IMAGE_URL = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHwO_-Mp4mmE5tIQgvrs8ZzsUiKwMWROUa8XAMFdKpYGzqxAXR9ciCYRZ9LBt-i1ukxzhTVQw_mcKbCm5jzFe6vySjmowjplpTMJBwV5HVfETSH6WwqlWHY2BEn_rMJn4jXXRX5ylMRwDGPssCFolj5akwy1Ny-Y3_JHFQZK3Jdf4HzaFwuBRXqwcDVhI/s407/qris.jpg';
+const RAJAONGKIR_API_KEY = 'gBFPpQZd9f94a0b3859a57deidGsYsCm';
+const SHOP_ORIGIN_SUBDISTRICT_ID = '32.15.03.2011';
+const GEMINI_API_KEY = 'AIzaSyBUalvW1ztILdy1dyLryrcJ8EEvUSw6g-o';
 
 // --- PENGATURAN LAINNYA ---
 const DB_PATH = './db.json';
-const MIN_WITHDRAWAL = 10000;
+const MIN_WITHDRAWAL = 100000;
 const DAILY_BONUS = 200;
 
 // --- INISIALISASI LIBRARY ---
