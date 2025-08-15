@@ -1,7 +1,7 @@
 # ALTO - Bot WhatsApp Canggih V1.0
 ### _Sebuah Proyek dari ALTOMEDIA_
 
-![Header]([https://i.imgur.com/your-header-image.png](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjH6ugvQY59wpkduNt1I5okR9uMHWahNn7yVfHaaU2-V4MjPgDnE2CRT-Dp0Omgwd83M60sL5fWvsOx7VLHzRdfOPObLzIZZaZJJxqI1IVcugWSlOaWVXrlByyBSBQZFrAEzyLyc90NbZpnEmiQpTNwU6gnvTj9wK-qfsqURUfOdYwcLRLP-jRZoSilVQ/s1024/ALTOMEDIA-6-8-2025.png)) <!-- Ganti dengan URL gambar header Anda -->
+![Header]([[https://i.imgur.com/your-header-image.png](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjH6ugvQY59wpkduNt1I5okR9uMHWahNn7yVfHaaU2-V4MjPgDnE2CRT-Dp0Omgwd83M60sL5fWvsOx7VLHzRdfOPObLzIZZaZJJxqI1IVcugWSlOaWVXrlByyBSBQZFrAEzyLyc90NbZpnEmiQpTNwU6gnvTj9wK-qfsqURUfOdYwcLRLP-jRZoSilVQ/s1024/ALTOMEDIA-6-8-2025.png](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjH6ugvQY59wpkduNt1I5okR9uMHWahNn7yVfHaaU2-V4MjPgDnE2CRT-Dp0Omgwd83M60sL5fWvsOx7VLHzRdfOPObLzIZZaZJJxqI1IVcugWSlOaWVXrlByyBSBQZFrAEzyLyc90NbZpnEmiQpTNwU6gnvTj9wK-qfsqURUfOdYwcLRLP-jRZoSilVQ/s1024/ALTOMEDIA-6-8-2025.png))) <!-- Ganti dengan URL gambar header Anda -->
 
 ALTO adalah sebuah bot WhatsApp multifungsi yang dirancang untuk mengotomatisasi berbagai tugas, mulai dari toko online interaktif hingga asisten AI pribadi. Ditenagai oleh **whatsapp-web.js** dan **Google Gemini AI**, bot ini siap melayani pengguna 24/7 dengan berbagai fitur canggih.
 
@@ -113,7 +113,7 @@ Berikut adalah panduan instalasi detail untuk tiga platform berbeda.
     ```
 3.  **Kloning Repositori:**
     ```bash
-    git clone [https://github.com/kdsmedia/1406bot.git](https://github.com/kdsmedia/1406bot.git)
+    git clone https://github.com/kdsmedia/1406bot.git
     ```
     *(Ganti `kdsmedia` dan `1406bot` dengan milik Anda)*
 4.  **Masuk ke Direktori Proyek:**
@@ -139,7 +139,7 @@ Berikut adalah panduan instalasi detail untuk tiga platform berbeda.
     * Tekan `Win + R`, ketik `cmd`, lalu tekan Enter.
 3.  **Kloning Repositori:**
     ```bash
-    git clone [https://github.com/kdsmedia/1406bot.git](https://github.com/kdsmedia/1406bot.git)
+    git clone https://github.com/kdsmedia/1406bot.git
     ```
 4.  **Masuk ke Direktori Proyek:**
     ```bash
@@ -169,7 +169,7 @@ Berikut adalah panduan instalasi detail untuk tiga platform berbeda.
     ```
 3.  **Kloning Repositori:**
     ```bash
-    git clone [https://github.com/kdsmedia/1406bot.git](https://github.com/kdsmedia/1406bot.git)
+    git clone https://github.com/kdsmedia/1406bot.git
     ```
 4.  **Masuk ke Direktori Proyek & Install Dependensi:**
     ```bash
