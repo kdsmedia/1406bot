@@ -27,7 +27,7 @@ const client = new Client({
 });
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const aiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+const aiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // DIUBAH SESUAI PERMINTAAN
 
 const rajaOngkir = axios.create({
     baseURL: 'https://api.rajaongkir.com/starter',
@@ -59,10 +59,15 @@ function setUserState(userId, state, progressData = null) {
     if (db.users[userId]) {
         db.users[userId].state = state;
         const progressKeys = ['addressFormProgress', 'checkoutProgress', 'confirmationProgress', 'generationProgress', 'productFormProgress'];
-        progressKeys.forEach(key => delete db.users[userId][key]);
+        progressKeys.forEach(key => {
+            if(key !== 'generationProgress') delete db.users[userId][key]
+        });
         if (progressData) {
             const key = Object.keys(progressData)[0];
             db.users[userId][key] = progressData[key];
+        }
+        if (state === 'idle') {
+            delete db.users[userId].generationProgress;
         }
         writeDb(db);
     }
@@ -252,7 +257,7 @@ async function sendProductDetail(chatId, productId) {
             await client.sendMessage(chatId, caption + "\n\n_(Gambar produk tidak dapat ditampilkan saat ini)_");
         }
     } else {
-        await client.sendMessage(chatId, caption); // Kirim teks saja jika tidak ada gambar
+        await client.sendMessage(chatId, caption);
     }
 
     const actionRows = [
@@ -266,7 +271,7 @@ async function sendProductDetail(chatId, productId) {
 
 async function handleAddToCart(chatId, productId, quantity) {
     const db = readDb();
-    getUser(chatId); // Memastikan user terdaftar
+    getUser(chatId);
     if (!db.users[chatId].cart) {
         db.users[chatId].cart = [];
     }
@@ -312,7 +317,8 @@ async function sendGeneratorMenu(chatId) {
     const generatorRows = [
         { id: 'gen_pantun', title: '✍️ Buat Pantun', description: 'Membuat pantun jenaka 4 baris.' },
         { id: 'gen_idekonten', title: '💡 Ide Konten Sosmed', description: 'Dapatkan 3 ide konten untuk Instagram/TikTok.' },
-        { id: 'gen_quote', title: '📜 Kata-Kata Bijak', description: 'Membuat quote motivasi original.' }
+        { id: 'gen_quote', title: '📜 Kata-Kata Bijak', description: 'Membuat quote motivasi original.' },
+        { id: 'gen_storyboard', title: '🎬 Buat Storyboard', description: 'Hasilkan 4 adegan dari sebuah konsep cerita.' }
     ];
     const sections = [{ title: 'Pilih Generator Konten', rows: generatorRows }];
     const generatorList = new List(
@@ -353,7 +359,7 @@ async function handleViewOrderHistory(chatId) {
         historyText += `-----------------------------------\n`;
         historyText += `*ID:* \`${order.id}\`\n`;
         historyText += `*Tanggal:* ${orderDate}\n`;
-        historyText += `*Total:* Rp ${order.grandTotal.toLocaleString('id-ID')}\n`;
+        historyText += `*Total:* Rp ${order.grandTotal.toLocaleString('id-ID')}\`\n`;
         historyText += `*Status:* *${order.status.replace('_', ' ').toUpperCase()}*\n`;
     }
     await client.sendMessage(chatId, historyText);
@@ -373,7 +379,7 @@ async function handleViewWithdrawalHistory(chatId) {
         historyText += `-----------------------------------\n`;
         historyText += `*ID:* \`${wd.id}\`\n`;
         historyText += `*Tanggal:* ${wdDate}\n`;
-        historyText += `*Jumlah:* Rp ${wd.amount.toLocaleString('id-ID')}\n`;
+        historyText += `*Jumlah:* Rp ${wd.amount.toLocaleString('id-ID')}\`\n`;
         historyText += `*Status:* *${wd.status.toUpperCase()}*\n`;
     }
     await client.sendMessage(chatId, historyText);
@@ -461,7 +467,7 @@ async function handleRejectCmd(adminChatId, messageBody) {
         writeDb(db);
         await client.sendMessage(adminChatId, `🗑️ Withdraw \`${wd.id}\` berhasil ditolak.`);
         await client.sendMessage(wd.userId, `❌ Penarikan Anda sebesar *Rp ${wd.amount.toLocaleString('id-ID')}* ditolak.\n\n*Alasan:* ${reason}\n\nSaldo telah dikembalikan.`);
-    } // Tambahkan logika untuk reject order jika perlu
+    }
     else {
         await client.sendMessage(adminChatId, '❌ Penolakan saat ini hanya didukung untuk Withdraw.');
     }
@@ -488,8 +494,6 @@ client.on('auth_failure', msg => {
 });
 
 client.on('group_join', async (notification) => {
-    // notification.chatId => group id
-    // notification.recipientIds => array of user ids
     try {
         const chat = await client.getChatById(notification.chatId);
         const newMembers = notification.recipientIds;
@@ -506,7 +510,6 @@ Semoga betah dan jangan lupa baca deskripsi grup ya. 😊`;
         console.error("Gagal mengirim pesan sambutan:", e);
     }
 });
-
 
 // ================================================================= //
 //                   ROUTER PESAN UTAMA (LENGKAP)                    //
@@ -529,18 +532,75 @@ client.on('message', async message => {
 
     // --- STATE-BASED INTERACTION HANDLER ---
     if (user.state !== 'idle') {
-        // ... (Logika state machine lengkap akan ditambahkan di sini)
-        console.log(`User ${chatId} is in state: ${user.state}`);
+        // --- State untuk Generator Biasa ---
+        if (user.state === 'awaiting_generation_topic') {
+            const topic = text;
+            const genType = user.generationProgress.type;
+            let prompt = '';
+            
+            if (genType === 'pantun') prompt = `Buatkan sebuah pantun jenaka 4 baris tentang "${topic}".`;
+            else if (genType === 'idekonten') prompt = `Berikan 3 ide konten sosial media (Instagram/TikTok) yang menarik tentang "${topic}".`;
+            else if (genType === 'quote') prompt = `Buat sebuah quote atau kata-kata bijak yang memotivasi tentang "${topic}".`;
+
+            await client.sendMessage(chatId, "🤖 AI sedang meracik kata-kata...");
+            const response = await getGeminiResponse(prompt);
+            await client.sendMessage(chatId, response);
+            setUserState(chatId, 'idle');
+        } 
+        // --- State untuk Alur Storyboard ---
+        else if (user.state === 'awaiting_storyboard_character') {
+            user.generationProgress.character = text;
+            setUserState(chatId, 'awaiting_storyboard_clothing', { generationProgress: user.generationProgress });
+            await client.sendMessage(chatId, "👕 Oke, sekarang masukkan *deskripsi pakaian & aksesoris* karakter.");
+        }
+        else if (user.state === 'awaiting_storyboard_clothing') {
+            user.generationProgress.clothing = text;
+            setUserState(chatId, 'awaiting_storyboard_concept', { generationProgress: user.generationProgress });
+            await client.sendMessage(chatId, "💡 Terakhir, masukkan *konsep cerita* singkatnya.");
+        }
+        else if (user.state === 'awaiting_storyboard_concept') {
+            const concept = text;
+            const prompt = `Anda adalah asisten kreatif. Berdasarkan konsep berikut, buat 4 deskripsi adegan satu kalimat. Balas HANYA dengan format JSON: {"scenes": ["adegan 1", "adegan 2", "adegan 3", "adegan 4"]}. Konsep: "${concept}"`;
+            
+            await client.sendMessage(chatId, "🤖 AI sedang membuat 4 adegan dari konsep Anda...");
+            const rawResponse = await getGeminiResponse(prompt);
+            
+            try {
+                const jsonString = rawResponse.replace(/```json\n|```/g, '').trim();
+                const result = JSON.parse(jsonString);
+                if (result.scenes && result.scenes.length === 4) {
+                    const { character, clothing } = user.generationProgress;
+                    const finalPrompt = `Kolase cerita visual dalam 4 panel. Menampilkan satu karakter yang konsisten di seluruh panel.
+
+Deskripsi Karakter: ${character}
+Pakaian Karakter: ${clothing}
+
+Panel 1: ${result.scenes[0]}
+Panel 2: ${result.scenes[1]}
+Panel 3: ${result.scenes[2]}
+Panel 4: ${result.scenes[3]}
+
+Gaya: fotorealistik, dengan pencahayaan sinematik. Pastikan penampilan karakter identik di setiap panel untuk konsistensi yang sempurna. Output akhir harus berupa satu gambar dengan tata letak grid 2x2.`;
+
+                    await client.sendMessage(chatId, `✅ Berhasil! Berikut adalah prompt final yang bisa Anda salin dan gunakan di generator gambar AI (seperti DALL-E di ChatGPT atau lainnya):`);
+                    await client.sendMessage(chatId, "```\n" + finalPrompt + "\n```");
+
+                } else {
+                    throw new Error("Format balasan AI tidak sesuai.");
+                }
+            } catch (e) {
+                console.error("Gagal mem-parsing JSON dari AI:", e);
+                await client.sendMessage(chatId, "Maaf, terjadi kesalahan saat memproses hasil dari AI. Coba lagi dengan konsep yang berbeda.");
+            }
+            setUserState(chatId, 'idle');
+        }
         return;
     }
     
     // --- MEDIA-BASED COMMAND HANDLER ---
     if (message.hasMedia) {
-        if (text.toLowerCase().startsWith('!konfirmasi')) {
-            // ... (logika konfirmasi pembayaran akan ditambahkan di sini)
-        } else if (isAdmin && text.toLowerCase().startsWith('!resi')) {
-            // ... (logika kirim resi akan ditambahkan di sini)
-        }
+        if (text.toLowerCase().startsWith('!konfirmasi')) { /* ... */ } 
+        else if (isAdmin && text.toLowerCase().startsWith('!resi')) { /* ... */ }
         return;
     }
     
@@ -548,53 +608,23 @@ client.on('message', async message => {
     if (text.startsWith('!')) {
         const command = text.toLowerCase().split(' ')[0];
         
-        // User Commands
         switch (command) {
-            case '!start':
-            case '!bantuan':
-                await handleStart(chatId);
-                break;
-            case '!katalog':
-                sendCatalogList(chatId);
-                break;
-            case '!keranjang':
-                handleViewCart(chatId);
-                break;
-            case '!saldo':
-                handleSaldoCmd(chatId);
-                break;
-            case '!klaim':
-            case '!bonus':
-                handleClaimBonusCmd(chatId);
-                break;
-            case '!withdraw':
-                handleWithdrawCmd(chatId, text);
-                break;
-            case '!generator':
-                sendGeneratorMenu(chatId);
-                break;
-            case '!riwayat':
-                sendHistoryMenu(chatId);
-                break;
-            // ... (dan seterusnya untuk semua perintah)
+            case '!start': case '!bantuan': await handleStart(chatId); break;
+            case '!katalog': sendCatalogList(chatId); break;
+            case '!keranjang': handleViewCart(chatId); break;
+            case '!saldo': handleSaldoCmd(chatId); break;
+            case '!klaim': case '!bonus': handleClaimBonusCmd(chatId); break;
+            case '!withdraw': handleWithdrawCmd(chatId, text); break;
+            case '!generator': sendGeneratorMenu(chatId); break;
+            case '!riwayat': sendHistoryMenu(chatId); break;
         }
 
-        // Admin Commands
         if (isAdmin) {
             switch (command) {
-                case '!tambahproduk':
-                    // await startAddProductForm(chatId);
-                    break;
-                case '!info':
-                    handleInfoCmd(chatId, text);
-                    break;
-                case '!approve':
-                    handleApproveCmd(chatId, text);
-                    break;
-                case '!reject':
-                    handleRejectCmd(chatId, text);
-                    break;
-                // ... (dan seterusnya untuk semua perintah admin)
+                case '!tambahproduk': /* ... */ break;
+                case '!info': handleInfoCmd(chatId, text); break;
+                case '!approve': handleApproveCmd(chatId, text); break;
+                case '!reject': handleRejectCmd(chatId, text); break;
             }
         }
         return;
@@ -609,16 +639,11 @@ client.on('message', async message => {
 
     if (text.startsWith('action_')) {
         const parts = text.split('_');
-        const action = parts[1];
-        const productId = parts[2];
-        const quantity = parseInt(parts[3]);
-
+        const action = parts[1], productId = parts[2], quantity = parseInt(parts[3]);
         if (action === 'beli') {
             await handleAddToCart(chatId, productId, quantity);
         } else if (action === 'checkout') {
             await handleAddToCart(chatId, productId, quantity);
-            // Segera panggil fungsi checkout setelah menambahkan ke keranjang
-            // await startCheckoutProcess(chatId); 
             await client.sendMessage(chatId, "Produk telah ditambahkan. Ketik *!checkout* untuk melanjutkan.");
         }
         return;
@@ -626,18 +651,24 @@ client.on('message', async message => {
 
     if (text.startsWith('history_')) {
         const historyType = text.split('_')[1];
-        if (historyType === 'orders') {
-            await handleViewOrderHistory(chatId);
-        } else if (historyType === 'withdrawals') {
-            await handleViewWithdrawalHistory(chatId);
-        }
+        if (historyType === 'orders') await handleViewOrderHistory(chatId);
+        else if (historyType === 'withdrawals') await handleViewWithdrawalHistory(chatId);
         return;
     }
     
-    if (text.startsWith('pay_') || text.startsWith('ship_') || text.startsWith('gen_')) {
-        // ... (Logika lengkap untuk menangani balasan dari List akan ditambahkan di sini)
+    if (text.startsWith('gen_')) {
+        const genType = text.split('_')[1];
+        if (genType === 'storyboard') {
+            setUserState(chatId, 'awaiting_storyboard_character', { generationProgress: { type: 'storyboard' } });
+            await client.sendMessage(chatId, "🎬 Oke, mari kita buat storyboard. Pertama, masukkan *deskripsi karakter* Anda.\n\nContoh: _wanita muda Indonesia, rambut hitam panjang_");
+        } else {
+            setUserState(chatId, 'awaiting_generation_topic', { generationProgress: { type: genType } });
+            await client.sendMessage(chatId, `✍️ Silakan ketik *topik* yang Anda inginkan untuk dibuatkan ${genType}.`);
+        }
         return;
     }
+
+    if (text.startsWith('pay_') || text.startsWith('ship_')) { /* ... */ return; }
 
     // --- FALLBACK TO GEMINI AI ---
     if (!chat.isGroup) {
@@ -646,4 +677,3 @@ client.on('message', async message => {
         await client.sendMessage(chatId, geminiResponse);
     }
 });
-
