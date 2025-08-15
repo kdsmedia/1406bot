@@ -114,7 +114,7 @@ async function getShippingOptions(destinationSubdistrictId, weightInGrams) {
 
 async function handleStart(chatId) {
     const startMessage = `👋 *Selamat Datang di Bot Canggih!*
-Saya adalah asisten virtual yang siap melayani Anda 24/7.
+Saya adalah ALTO yang siap melayani Anda 24/7.
 
 🛒 *Menu Belanja*
 - Ketik *!katalog* untuk melihat semua produk.
@@ -139,7 +139,7 @@ Saya adalah asisten virtual yang siap melayani Anda 24/7.
 
 async function handleSaldoCmd(chatId) {
     const userData = getUser(chatId);
-    await client.sendMessage(chatId, `💰 Saldo Anda saat ini adalah: *Rp ${userData.balance.toLocaleString('id-ID')}*`);
+    await client.sendMessage(chatId, `💰 Saldo Anda: *Rp ${userData.balance.toLocaleString('id-ID')}*`);
 }
 
 async function handleClaimBonusCmd(chatId) {
@@ -221,7 +221,7 @@ async function sendCatalogList(chatId) {
         'Lihat Produk',
         sections,
         'Katalog Produk Kami',
-        'Toko Bot Canggih'
+        'Toko Masa Depan'
     );
 
     await client.sendMessage(chatId, catalogList);
@@ -322,10 +322,10 @@ async function sendGeneratorMenu(chatId) {
     ];
     const sections = [{ title: 'Pilih Generator Konten', rows: generatorRows }];
     const generatorList = new List(
-        'Pilih jenis konten yang ingin Anda buat dengan bantuan AI.',
+        'Pilih jenis konten yang ingin Anda buat dengan bantuan ALTO.',
         'Pilih Generator',
         sections,
-        'Menu AI Generator'
+        'Menu ALTO Generator'
     );
     await client.sendMessage(chatId, generatorList);
 }
@@ -500,7 +500,7 @@ client.on('group_join', async (notification) => {
 
         for (const memberId of newMembers) {
             const contact = await client.getContactById(memberId);
-            const welcomeMessage = `👋 Halo @${contact.number}, selamat datang di grup *${chat.name}*!
+            const welcomeMessage = `👋 Halo @${contact.number}, selamat datang di *${chat.name}*!
 
 Semoga betah dan jangan lupa baca deskripsi grup ya. 😊`;
             
@@ -542,7 +542,7 @@ client.on('message', async message => {
             else if (genType === 'idekonten') prompt = `Berikan 3 ide konten sosial media (Instagram/TikTok) yang menarik tentang "${topic}".`;
             else if (genType === 'quote') prompt = `Buat sebuah quote atau kata-kata bijak yang memotivasi tentang "${topic}".`;
 
-            await client.sendMessage(chatId, "🤖 AI sedang meracik kata-kata...");
+            await client.sendMessage(chatId, "🤖 ALTO sedang meracik kata-kata...");
             const response = await getGeminiResponse(prompt);
             await client.sendMessage(chatId, response);
             setUserState(chatId, 'idle');
@@ -562,7 +562,7 @@ client.on('message', async message => {
             const concept = text;
             const prompt = `Anda adalah asisten kreatif. Berdasarkan konsep berikut, buat 4 deskripsi adegan satu kalimat. Balas HANYA dengan format JSON: {"scenes": ["adegan 1", "adegan 2", "adegan 3", "adegan 4"]}. Konsep: "${concept}"`;
             
-            await client.sendMessage(chatId, "🤖 AI sedang membuat 4 adegan dari konsep Anda...");
+            await client.sendMessage(chatId, "🤖 ALTO sedang membuat 4 adegan dari konsep Anda...");
             const rawResponse = await getGeminiResponse(prompt);
             
             try {
@@ -582,15 +582,15 @@ Panel 4: ${result.scenes[3]}
 
 Gaya: fotorealistik, dengan pencahayaan sinematik. Pastikan penampilan karakter identik di setiap panel untuk konsistensi yang sempurna. Output akhir harus berupa satu gambar dengan tata letak grid 2x2.`;
 
-                    await client.sendMessage(chatId, `✅ Berhasil! Berikut adalah prompt final yang bisa Anda salin dan gunakan di generator gambar AI (seperti DALL-E di ChatGPT atau lainnya):`);
+                    await client.sendMessage(chatId, `✅ Berhasil! Berikut adalah prompt final yang bisa Anda salin dan gunakan di generator gambar ALTO:`);
                     await client.sendMessage(chatId, "```\n" + finalPrompt + "\n```");
 
                 } else {
-                    throw new Error("Format balasan AI tidak sesuai.");
+                    throw new Error("Format balasan ALTO tidak sesuai.");
                 }
             } catch (e) {
-                console.error("Gagal mem-parsing JSON dari AI:", e);
-                await client.sendMessage(chatId, "Maaf, terjadi kesalahan saat memproses hasil dari AI. Coba lagi dengan konsep yang berbeda.");
+                console.error("Gagal mem-parsing JSON dari ALTO:", e);
+                await client.sendMessage(chatId, "Maaf, terjadi kesalahan saat memproses hasil dari ALTO. Coba lagi dengan konsep yang berbeda.");
             }
             setUserState(chatId, 'idle');
         }
@@ -672,7 +672,7 @@ Gaya: fotorealistik, dengan pencahayaan sinematik. Pastikan penampilan karakter 
 
     // --- FALLBACK TO GEMINI AI ---
     if (!chat.isGroup) {
-        await client.sendMessage(chatId, "🤖 AI sedang berpikir...");
+        await client.sendMessage(chatId, "🤖 ALTO lagi mikir...");
         const geminiResponse = await getGeminiResponse(text);
         await client.sendMessage(chatId, geminiResponse);
     }
