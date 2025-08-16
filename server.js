@@ -4,7 +4,7 @@
 
 // --- IMPORTS LIBRARY ---
 const fs = require('fs');
-const { Client, LocalAuth, MessageMedia, List } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia, List } = require('whatsapp-web.js'); 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const axios = require('axios');
 
