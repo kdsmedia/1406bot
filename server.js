@@ -10,10 +10,10 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const axios = require('axios');
 
 // --- KONFIGURASI PENTING (WAJIB DIISI!) ---
-const ADMIN_WID = '6285813899649';
+const ADMIN_WID = ['6285813899649@c.us', '6283872543697@c.us']; // Diubah menjadi Array
 const QRIS_IMAGE_URL = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHwO_-Mp4mmE5tIQgvrs8ZzsUiKwMWROUa8XAMFdKpYGzqxAXR9ciCYRZ9LBt-i1ukxzhTVQw_mcKbCm5jzFe6vySjmowjplpTMJBwV5HVfETSH6WwqlWHY2BEn_rMJn4jXXRX5ylMRwDGPssCFolj5akwy1Ny-Y3_JHFQZK3Jdf4HzaFwuBRXqwcDVhI/s407/qris.jpg';
 const RAJAONGKIR_API_KEY = 'gBFPpQZd9f94a0b3859a57deidGsYsCm';
-const SHOP_ORIGIN_SUBDISTRICT_ID = '32.15.03.2011';
+const SHOP_ORIGIN_SUBDISTRICT_ID = '2276'; // GANTI DENGAN ID KECAMATAN YANG BENAR DARI RAJAONGKIR
 const GEMINI_API_KEY = 'AIzaSyBUalvW1ztILdy1dyLryrcJ8EEvUSw6g-o';
 
 // --- PENGATURAN LAINNYA ---
@@ -24,9 +24,16 @@ const DAILY_BONUS = 200;
 // --- INISIALISASI LIBRARY ---
 const client = new Client({
     authStrategy: new LocalAuth(),
-    executablePath: '/usr/bin/chromium-browser',
+    // Hapus baris 'executablePath' jika Anda tidak di VPS atau jika menyebabkan error
+    executablePath: '/usr/bin/chromium-browser', 
     puppeteer: { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
 });
+
+// --- PENGATURAN LAINNYA ---
+const DB_PATH = './db.json';
+const MIN_WITHDRAWAL = 100000;
+const DAILY_BONUS = 200;
+
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const aiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // DIUBAH SESUAI PERMINTAAN
