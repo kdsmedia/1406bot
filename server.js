@@ -1,5 +1,5 @@
 // ================================================================= //
-//         BOT WHATSAPP & ADMIN PANEL V3.6 - CONNECTION FIX        //
+//         BOT WHATSAPP & ADMIN PANEL V3.8 - FINAL FIX             //
 // ================================================================= //
 
 // --- IMPORTS LIBRARY ---
@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: { 
-        headless: true, // Pastikan berjalan tanpa UI
+        headless: true,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -34,7 +34,7 @@ const client = new Client({
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            '--single-process', // Opsional, bisa membantu di lingkungan terbatas
+            '--single-process',
             '--disable-gpu'
         ],
         executablePath: '/usr/bin/google-chrome-stable'
@@ -73,7 +73,7 @@ function initializeApiClients(settings) {
         }
         console.log("✅ Klien API berhasil diinisialisasi.");
     } catch (error) {
-        console.error("❌ Gagal menginisialisasi Klien API. Periksa API Key Anda:", error.message);
+        console.error("❌ Gagal menginisialisasi Klien API:", error.message);
     }
 }
 
@@ -131,7 +131,7 @@ io.on('connection', (socket) => {
         writeDb(db);
         initializeApiClients(newSettings);
         socket.emit('settings_saved', { message: 'Pengaturan disimpan! Bot akan restart...' });
-        console.log('Server akan restart dalam 2 detik untuk menerapkan perubahan...');
+        console.log('Server akan restart dalam 2 detik...');
         setTimeout(() => { process.exit(0); }, 2000);
     });
     socket.on('approve_withdrawal', async (data) => { await handleApproveCmd(null, `!approve ${data.id}`); });
@@ -182,12 +182,116 @@ async function sendProfileMenu(chatId) {
     await client.sendMessage(chatId, list);
 }
 
-// ... (Semua fungsi bot lainnya seperti handleWithdrawCmd, dll. harus ada di sini)
+async function sendAdminMenu(chatId) {
+    console.log(`[FUNGSI] Menjalankan sendAdminMenu untuk ${chatId}`);
+    const list = new List(
+        '👑 *Selamat Datang, Admin!*\nSilakan pilih salah satu perintah di bawah ini untuk mengelola bot.',
+        'Buka Menu Admin',
+        [{ title: 'Menu Khusus Admin', rows: [
+            { id: 'cmd_tambahproduk', title: '📦 Tambah Produk Baru' },
+            { id: 'cmd_start', title: '⬅️ Kembali ke Menu Utama' },
+        ]}],
+        'Menu Admin'
+    );
+    await client.sendMessage(chatId, list);
+}
+
 async function handleSaldoCmd(chatId) {
     console.log(`[FUNGSI] Menjalankan handleSaldoCmd untuk ${chatId}`);
     const userData = getUser(chatId);
     await client.sendMessage(chatId, `💰 Saldo Anda: *Rp ${userData.balance.toLocaleString('id-ID')}*`);
 }
+
+async function handleClaimBonusCmd(chatId) {
+    console.log(`[FUNGSI] Menjalankan handleClaimBonusCmd untuk ${chatId}`);
+    const db = readDb();
+    const DAILY_BONUS = db.settings.dailyBonus;
+    const userData = getUser(chatId);
+    const lastClaimDate = new Date(userData.lastClaim);
+    const now = new Date();
+    const timeDifference = now.getTime() - lastClaimDate.getTime();
+    const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+
+    if (timeDifference >= twentyFourHoursInMs) {
+        db.users[chatId].balance += DAILY_BONUS;
+        db.users[chatId].lastClaim = now.toISOString();
+        writeDb(db);
+        const newBalance = db.users[chatId].balance;
+        await client.sendMessage(chatId, `🎉 Selamat! Anda berhasil mengklaim bonus harian sebesar *Rp ${DAILY_BONUS}*.\n\nSaldo Anda sekarang: *Rp ${newBalance.toLocaleString('id-ID')}*`);
+    } else {
+        const remainingTime = twentyFourHoursInMs - timeDifference;
+        const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+        const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+        await client.sendMessage(chatId, `⏳ Anda sudah mengklaim bonus hari ini.\n\nSilakan coba lagi dalam *${hours} jam ${minutes} menit*.`);
+    }
+}
+
+async function handleWithdrawCmd(chatId, messageBody) {
+    console.log(`[FUNGSI] Menjalankan handleWithdrawCmd untuk ${chatId}`);
+    const db = readDb();
+    const { minWithdrawal, adminWID } = db.settings;
+    const parts = messageBody.split(' ');
+    if (parts.length < 4 && messageBody.startsWith('!')) {
+        await client.sendMessage(chatId, `❌ Format salah. Gunakan:\n*!withdraw <jumlah> <metode> <nomor tujuan>*`); return;
+    }
+    if (parts.length === 1 && (messageBody.startsWith('cmd_') || messageBody.startsWith('!'))) {
+        await client.sendMessage(chatId, `Untuk menarik saldo, ketik:\n*!withdraw <jumlah> <metode> <nomor tujuan>*`); return;
+    }
+    const amount = parseInt(parts[1]);
+    const method = parts[2].toUpperCase();
+    const accountDetails = parts[3];
+    if (isNaN(amount)) { await client.sendMessage(chatId, '❌ Jumlah harus berupa angka.'); return; }
+    if (amount < minWithdrawal) { await client.sendMessage(chatId, `❌ Minimal penarikan adalah *Rp ${minWithdrawal.toLocaleString('id-ID')}*.`); return; }
+    const userData = getUser(chatId);
+    if (amount > userData.balance) { await client.sendMessage(chatId, `❌ Saldo Anda tidak mencukupi.`); return; }
+    
+    db.users[chatId].balance -= amount;
+    const withdrawalId = `WD${Date.now()}`;
+    const newWithdrawal = { id: withdrawalId, userId: chatId, amount, method, accountDetails, status: 'pending', requestTimestamp: new Date().toISOString() };
+    if (!db.withdrawals) db.withdrawals = [];
+    db.withdrawals.push(newWithdrawal);
+    writeDb(db);
+    
+    await client.sendMessage(chatId, `✅ Permintaan penarikan Anda sebesar *Rp ${amount.toLocaleString('id-ID')}* telah diterima.`);
+    const adminMessage = `🔔 *Permintaan Withdraw Baru*\n\nID: \`${withdrawalId}\`\nDari: \`${chatId.split('@')[0]}\`\nJumlah: *Rp ${amount.toLocaleString('id-ID')}*\nMetode: *${method}*\nTujuan: \`${accountDetails}\``;
+    adminWID.forEach(admin => client.sendMessage(admin, adminMessage));
+}
+
+async function handleApproveCmd(adminChatId, messageBody) {
+    console.log(`[FUNGSI] Menjalankan handleApproveCmd`);
+    const idToApprove = messageBody.split(' ')[1];
+    if (!idToApprove) { if(adminChatId) await client.sendMessage(adminChatId, 'Format salah: *!approve <ID>*'); return; }
+    const db = readDb();
+    if (idToApprove.startsWith('WD')) {
+        const wdIndex = db.withdrawals.findIndex(wd => wd.id === idToApprove);
+        if (wdIndex === -1 || db.withdrawals[wdIndex].status !== 'pending') { if(adminChatId) await client.sendMessage(adminChatId, '❌ ID Withdraw tidak ditemukan/sudah diproses.'); return; }
+        db.withdrawals[wdIndex].status = 'completed';
+        const wd = db.withdrawals[wdIndex];
+        writeDb(db); 
+        if(adminChatId) await client.sendMessage(adminChatId, `✅ Withdraw \`${wd.id}\` berhasil disetujui.`);
+        await client.sendMessage(wd.userId, `✅ Penarikan Anda sebesar *Rp ${wd.amount.toLocaleString('id-ID')}* telah berhasil dikirim.`);
+    }
+}
+
+async function handleRejectCmd(adminChatId, messageBody) {
+    console.log(`[FUNGSI] Menjalankan handleRejectCmd`);
+    const parts = messageBody.split(' ');
+    const idToReject = parts[1];
+    const reason = parts.slice(2).join(' ') || 'Tidak ada alasan spesifik.';
+    if (!idToReject) { if(adminChatId) await client.sendMessage(adminChatId, 'Format salah: *!reject <ID> <alasan>*'); return; }
+    const db = readDb();
+    if (idToReject.startsWith('WD')) {
+        const wdIndex = db.withdrawals.findIndex(wd => wd.id === idToReject);
+        if (wdIndex === -1 || db.withdrawals[wdIndex].status !== 'pending') { if(adminChatId) await client.sendMessage(adminChatId, '❌ ID Withdraw tidak ditemukan/sudah diproses.'); return; }
+        const wd = db.withdrawals[wdIndex];
+        db.users[wd.userId].balance += wd.amount;
+        db.withdrawals[wdIndex].status = 'rejected';
+        writeDb(db);
+        if(adminChatId) await client.sendMessage(adminChatId, `🗑️ Withdraw \`${wd.id}\` berhasil ditolak.`);
+        await client.sendMessage(wd.userId, `❌ Penarikan Anda sebesar *Rp ${wd.amount.toLocaleString('id-ID')}* ditolak.\n\n*Alasan:* ${reason}\n\nSaldo telah dikembalikan.`);
+    }
+}
+
 
 // ================================================================= //
 //                      INISIALISASI & EVENT LISTENER                //
@@ -247,6 +351,8 @@ client.on('message', async (message) => {
                 case 'start': await handleStart(chatId); break;
                 case 'profil': await sendProfileMenu(chatId); break;
                 case 'saldo': await handleSaldoCmd(chatId); break;
+                case 'klaim': await handleClaimBonusCmd(chatId); break;
+                case 'withdraw': await handleWithdrawCmd(chatId, text); break;
                 default: console.log(`Perintah cmd tidak dikenal: ${command}`);
             }
             return;
@@ -260,13 +366,17 @@ client.on('message', async (message) => {
                 case '!start': await handleStart(chatId); break;
                 case '!profil': await sendProfileMenu(chatId); break;
                 case '!saldo': await handleSaldoCmd(chatId); break;
+                case '!klaim': await handleClaimBonusCmd(chatId); break;
+                case '!withdraw': await handleWithdrawCmd(chatId, text); break;
                 default: 
-                    if (!isAdmin) {
-                         await client.sendMessage(chatId, "Maaf, perintah tidak dikenali. Ketik *!start* untuk melihat menu.");
-                    }
+                    if (!isAdmin) { await client.sendMessage(chatId, "Maaf, perintah tidak dikenali. Ketik *!start*."); }
             }
             if (isAdmin) {
-                 // ... (perintah admin di sini)
+                 switch (command) {
+                    case '!admin': await sendAdminMenu(chatId); break;
+                    case '!approve': await handleApproveCmd(chatId, text); break;
+                    case '!reject': await handleRejectCmd(chatId, text); break;
+                 }
             }
             return;
         }
