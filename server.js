@@ -36,7 +36,7 @@ let genAI, aiModel, rajaOngkir;
 
 function getDefaultSettings() {
     return {
-        adminWID: ['6285813899649@c.us', '6283872543697@c.us'],
+        adminWID: ['6283872543697@c.us'],
         qrisImageURL: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHwO_-Mp4mmE5tIQgvrs8ZzsUiKwMWROUa8XAMFdKpYGzqxAXR9ciCYRZ9LBt-i1ukxzhTVQw_mcKbCm5jzFe6vySjmowjplpTMJBwV5HVfETSH6WwqlWHY2BEn_rMJn4jXXRX5ylMRwDGPssCFolj5akwy1Ny-Y3_JHFQZK3Jdf4HzaFwuBRXqwcDVhI/s407/qris.jpg',
         rajaongkirApiKey: 'gBFPpQZd9f94a0b3859a57deidGsYsCm',
         shopOriginSubdistrictId: '2276',
