@@ -23,21 +23,18 @@ const io = new Server(server);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- INISIALISASI WHATSAPP & AI ---
+// [PERBAIKAN] Konfigurasi puppeteer disederhanakan untuk stabilitas dan kompatibilitas.
+// Menghapus 'executablePath' akan membuat whatsapp-web.js secara otomatis
+// mengunduh dan menggunakan versi Chromium yang paling sesuai. Ini adalah
+// cara yang paling direkomendasikan untuk menghindari error saat bot dimulai.
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: { 
         headless: true,
         args: [
             '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process',
-            '--disable-gpu'
-        ],
-        executablePath: '/usr/bin/google-chrome-stable'
+            '--disable-setuid-sandbox'
+        ]
     }
 });
 
@@ -63,7 +60,7 @@ function initializeApiClients(settings) {
     try {
         if (settings.geminiApiKey) {
             genAI = new GoogleGenerativeAI(settings.geminiApiKey);
-            aiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            aiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Model bisa disesuaikan
         }
         if (settings.rajaongkirApiKey) {
             rajaOngkir = axios.create({
@@ -239,7 +236,7 @@ async function handleWithdrawCmd(chatId, messageBody) {
     }
     const amount = parseInt(parts[1]);
     const method = parts[2].toUpperCase();
-    const accountDetails = parts[3];
+    const accountDetails = parts.slice(3).join(' '); // Diperbaiki untuk menangani nama/detail dengan spasi
     if (isNaN(amount)) { await client.sendMessage(chatId, '❌ Jumlah harus berupa angka.'); return; }
     if (amount < minWithdrawal) { await client.sendMessage(chatId, `❌ Minimal penarikan adalah *Rp ${minWithdrawal.toLocaleString('id-ID')}*.`); return; }
     const userData = getUser(chatId);
