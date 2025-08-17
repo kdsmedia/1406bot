@@ -1,53 +1,61 @@
 {
-  "products": [
-    {
-      "id": "K01",
-      "name": "Kopi Robusta 250gr",
-      "price": 50000,
-      "weight": 270,
-      "description": "Biji kopi robusta asli dari lereng gunung yang subur, diproses secara alami untuk menghasilkan cita rasa yang kuat dan aroma yang khas.",
-      "imageUrls": [
-        "https://i.imgur.com/q7p4V5s.jpeg"
-      ],
-      "category": "Minuman",
-      "colors": [],
-      "sizes": []
-    },
-    {
-      "id": "TS01",
-      "name": "T-Shirt Polos Premium",
-      "price": 85000,
-      "weight": 250,
-      "description": "Kaos polos premium bahan cotton combed 24s, adem dan nyaman dipakai sehari-hari.",
-      "imageUrls": [
-        "https://i.imgur.com/a4z2r9c.jpeg"
-      ],
-      "category": "Fashion",
-      "colors": [
-        "Hitam",
-        "Putih",
-        "Navy"
-      ],
-      "sizes": [
-        "S",
-        "M",
-        "L",
-        "XL"
-      ]
-    }
-  ],
-  "users": {},
-  "withdrawals": [],
-  "orders": [],
   "settings": {
     "adminWID": [
-      "6283872543697@c.us"
+      "6281234567890@c.us"
     ],
-    "qrisImageURL": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHwO_-Mp4mmE5tIQgvrs8ZzsUiKwMWROUa8XAMFdKpYGzqxAXR9ciCYRZ9LBt-i1ukxzhTVQw_mcKbCm5jzFe6vySjmowjplpTMJBwV5HVfETSH6WwqlWHY2BEn_rMJn4jXXRX5ylMRwDGPssCFolj5akwy1Ny-Y3_JHFQZK3Jdf4HzaFwuBRXqwcDVhI/s407/qris.jpg",
-    "rajaongkirApiKey": "gBFPpQZd9f94a0b3859a57deidGsYsCm",
-    "shopOriginSubdistrictId": "2276",
-    "geminiApiKey": "AIzaSyBUalvW1ztILdy1dyLryrcJ8EEvUSw6g-o",
-    "minWithdrawal": 100000,
-    "dailyBonus": 200
-  }
+    "geminiApiKey": "MASUKKAN_KUNCI_API_GEMINI_ANDA_DI_SINI",
+    "rajaongkirApiKey": "MASUKKAN_KUNCI_API_RAJAONGKIR_ANDA_DI_SINI",
+    "qrisImageURL": "https://link-ke-gambar-qris-anda.com/qris.jpg",
+    "shopOriginSubdistrictId": "153",
+    "minWithdrawal": 25000,
+    "dailyBonus": 1000
+  },
+  "users": {
+    "6289876543210@c.us": {
+      "joinedAt": "2025-08-17T00:00:00.000Z",
+      "balance": 50000,
+      "lastBonus": null
+    }
+  },
+  "products": [
+    {
+      "id": "prod_1723868681191",
+      "name": "Produk Contoh 1",
+      "price": 75000,
+      "description": "Ini adalah deskripsi untuk produk contoh pertama.",
+      "category": "Elektronik",
+      "weight": 500,
+      "imageUrls": []
+    },
+    {
+      "id": "prod_1723868710292",
+      "name": "Produk Contoh 2",
+      "price": 125000,
+      "description": "Ini adalah deskripsi untuk produk contoh kedua.",
+      "category": "Aksesoris",
+      "weight": 250,
+      "imageUrls": []
+    }
+  ],
+  "orders": [
+    {
+      "id": "order_1723868742131",
+      "userId": "6289876543210@c.us",
+      "product": "Produk Contoh 1",
+      "amount": 75000,
+      "status": "completed",
+      "createdAt": "2025-08-17T01:05:42.131Z"
+    }
+  ],
+  "withdrawals": [
+    {
+      "id": "wd_1723868783451",
+      "userId": "6289876543210@c.us",
+      "amount": 25000,
+      "method": "DANA",
+      "accountDetails": "089876543210",
+      "status": "pending",
+      "createdAt": "2025-08-17T01:06:23.451Z"
+    }
+  ]
 }
