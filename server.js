@@ -14,7 +14,7 @@ const path = require('path');
 
 // --- PENGATURAN AWAL & PATH ---
 const DB_PATH = './db.json';
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 369;
 
 // --- INISIALISASI WEB SERVER & SOCKET.IO ---
 const app = express();
