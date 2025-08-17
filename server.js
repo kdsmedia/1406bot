@@ -68,7 +68,7 @@ loadDatabase();
 // --- 3. PENGATURAN EXPRESS SERVER ---
 // Menyajikan file `index.html` saat seseorang mengakses root URL
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'public'));
 });
 
 // --- 4. INISIALISASI WHATSAPP CLIENT (BOT) ---
