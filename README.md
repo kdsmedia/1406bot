@@ -132,7 +132,11 @@ Install PM2 & Nodemon:
 sudo npm install -g pm2 nodemon
 ```
 ## Jalankan Bot dengan PM2:
-Gunakan ```npm start``` yang sudah dikonfigurasi di package.json untuk menjalankan server dengan nodemon melalui 
+Gunakan 
+```
+npm start
+```
+ yang sudah dikonfigurasi di package.json untuk menjalankan server dengan nodemon melalui 
 ```
 PM2.pm2 start "npm start" --name "1406bot"
 ```
@@ -146,12 +150,15 @@ pm2 logs 1406bot
 ## Pindai QR code yang muncul menggunakan aplikasi WhatsApp Anda. Setelah berhasil, hentikan tampilan log dengan menekan Ctrl + C. Bot akan tetap berjalan di latar belakang.
 ## Simpan Proses PM2:
 Agar bot otomatis berjalan kembali jika VPS restart, jalankan: 
-```pm2 save```
+```
+pm2 save
+```
 
 ## ⚙️ KonfigurasiKonfigurasi Awal (Wajib):
 Saat pertama kali menjalankan proyek, buka file db.json.
 Sesuaikan semua nilai di dalam objek settings (seperti adminWID, geminiApiKey, dll.) dengan data Anda.Konfigurasi Selanjutnya:Setelah bot berjalan, semua perubahan konfigurasi harus dilakukan melalui Panel Admin di halaman "Settings" untuk kemudahan dan keamanan.
 
 ## ⚙️ Mengakses Panel AdminSetelah bot berjalan, Anda bisa mengakses panel admin melalui browser di:
-http://IP_ADDRESS_VPS_ANDA:3000Jika Anda sudah mengatur reverse proxy dengan Nginx/Caddy dan SSL, Anda bisa mengaksesnya melalui domain Anda:
+http://IP_ADDRESS_VPS_ANDA:3000
+Jika Anda sudah mengatur reverse proxy dengan Nginx/Caddy dan SSL, Anda bisa mengaksesnya melalui domain Anda:
 https://domain-anda.com
