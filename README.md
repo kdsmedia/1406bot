@@ -78,132 +78,80 @@ Terima kasih kepada para sponsor yang telah mendukung proyek ini!
 
 ![Header](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjH6ugvQY59wpkduNt1I5okR9uMHWahNn7yVfHaaU2-V4MjPgDnE2CRT-Dp0Omgwd83M60sL5fWvsOx7VLHzRdfOPObLzIZZaZJJxqI1IVcugWSlOaWVXrlByyBSBQZFrAEzyLyc90NbZpnEmiQpTNwU6gnvTj9wK-qfsqURUfOdYwcLRLP-jRZoSilVQ/s1024/ALTOMEDIA-6-8-2025.png) <!-- Ganti dengan URL gambar header Anda -->
 
-Ingin menjadi sponsor? [Hubungi kami!](mailto:altomediaindonesia@gmail.com)
+## Ingin menjadi sponsor? [Hubungi kami!](mailto:altomediaindonesia@gmail.com)
 
 ---
 
-## 🛠️ Prasyarat
+## 🛠️ PrasyaratSebelum memulai instalasi, pastikan sistem Anda telah terpasang perangkat lunak berikut:
+-- Node.js (Versi 16 atau lebih tinggi)
+-- Git (Untuk mengkloning repositori)
+-- PM2 (Untuk menjalankan bot 24/7 di VPS)
 
-Sebelum memulai instalasi, pastikan sistem Anda telah terpasang perangkat lunak berikut:
-* **Node.js** (Versi 16 atau lebih tinggi)
-* **Git** (Untuk mengkloning repositori)
+## 📂 Struktur File ProyekStruktur proyek Anda yang benar akan terlihat seperti ini:
+```
+/nama-folder-proyek
+├── /public
+│   └── index.html      # Antarmuka Panel Admin
+├── server.js           # Logika utama bot & web server
+├── package.json        # Daftar dependensi & skrip
+└── db.json             # Database untuk produk, user, & settings
+```
 
----
 
-## 📂 Struktur File Proyek
+🚀 Langkah-langkah Instalasi di VPS (Disarankan)
+Metode ini menggunakan PM2 agar bot dan panel admin tetap berjalan 24/7 meskipun Anda menutup terminal.
 
-Pastikan Anda memiliki tiga file utama ini dalam satu folder:
+## Update Sistem & Instalasi Awal:
 
-/nama-folder-proyek├── server.js         # Logika utama bot├── package.json      # Daftar dependensi & skrip└── db.json           # Database untuk produk, user, dll.
----
+```
+sudo apt update && sudo apt upgrade -y
+```
+```
+sudo apt install git -y
+```
+```
+curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install nodejs -y
+```
 
-## 🚀 Langkah-langkah Instalasi
+## Kloning Repositori:
+```
+git clone https://github.com/kdsmedia/1406bot.git
+```
 
-Berikut adalah panduan instalasi detail untuk tiga platform berbeda.
+## Masuk ke Direktori & Install Dependensi:
+```
+cd 1406bot
+```
+```
+npm install
+```
 
-### 1. Instalasi di Termux (Android)
+Install PM2 & Nodemon:
+```
+sudo npm install -g pm2 nodemon
+```
+## Jalankan Bot dengan PM2:
+Gunakan ```npm start``` yang sudah dikonfigurasi di package.json untuk menjalankan server dengan nodemon melalui 
+```
+PM2.pm2 start "npm start" --name "1406bot"
+```
 
-1.  **Update & Upgrade Termux:**
-    ```bash
-    pkg update && pkg upgrade
-    ```
-2.  **Install Git & Node.js:**
-    ```bash
-    pkg install git nodejs -y
-    ```
-3.  **Kloning Repositori:**
-    ```bash
-    git clone https://github.com/kdsmedia/1406bot.git
-    ```
-    *(Ganti `kdsmedia` dan `1406bot` dengan milik Anda)*
-4.  **Masuk ke Direktori Proyek:**
-    ```bash
-    cd 1406bot
-    ```
-5.  **Install Dependensi:**
-    ```bash
-    npm install
-    ```
-6.  **Jalankan Bot:**
-    ```bash
-    npm start
-    ```
-    Pindai QR code yang muncul di terminal menggunakan aplikasi WhatsApp Anda.
+## Lihat QR Code (Hanya Pertama Kali):
+Untuk melihat QR code yang perlu Anda pindai, jalankan perintah berikut:
+```
+pm2 logs 1406bot
+```
 
-### 2. Instalasi di CMD (Windows)
+## Pindai QR code yang muncul menggunakan aplikasi WhatsApp Anda. Setelah berhasil, hentikan tampilan log dengan menekan Ctrl + C. Bot akan tetap berjalan di latar belakang.
+## Simpan Proses PM2:
+Agar bot otomatis berjalan kembali jika VPS restart, jalankan: 
+```pm2 save```
 
-1.  **Install Node.js & Git:**
-    * Unduh dan install **Node.js** dari [situs resminya](https://nodejs.org/).
-    * Unduh dan install **Git** dari [situs resminya](https://git-scm.com/).
-2.  **Buka Command Prompt (CMD):**
-    * Tekan `Win + R`, ketik `cmd`, lalu tekan Enter.
-3.  **Kloning Repositori:**
-    ```bash
-    git clone https://github.com/kdsmedia/1406bot.git
-    ```
-4.  **Masuk ke Direktori Proyek:**
-    ```bash
-    cd 1406bot
-    ```
-5.  **Install Dependensi:**
-    ```bash
-    npm install
-    ```
-6.  **Jalankan Bot:**
-    ```bash
-    npm start
-    ```
-    Sebuah QR code akan muncul. Pindai menggunakan WhatsApp Anda.
+## ⚙️ KonfigurasiKonfigurasi Awal (Wajib):
+Saat pertama kali menjalankan proyek, buka file db.json.
+Sesuaikan semua nilai di dalam objek settings (seperti adminWID, geminiApiKey, dll.) dengan data Anda.Konfigurasi Selanjutnya:Setelah bot berjalan, semua perubahan konfigurasi harus dilakukan melalui Panel Admin di halaman "Settings" untuk kemudahan dan keamanan.
 
-### 3. Instalasi di VPS (Linux - Ubuntu/Debian)
-
-1.  **Update Sistem:**
-    ```bash
-    sudo apt update && sudo apt upgrade -y
-    ```
-2.  **Install Git & Node.js:**
-    ```bash
-    sudo apt install git -y
-    curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-    sudo apt install nodejs -y
-    ```
-3.  **Kloning Repositori:**
-    ```bash
-    git clone https://github.com/kdsmedia/1406bot.git
-    ```
-4.  **Masuk ke Direktori Proyek & Install Dependensi:**
-    ```bash
-    cd 1406bot
-    npm install
-    ```
-5.  **Jalankan Bot 24/7 dengan PM2:**
-    * Install PM2 (Process Manager for Node.js):
-        ```bash
-        sudo npm install -g pm2
-        ```
-    * Mulai bot menggunakan PM2:
-        ```bash
-        pm2 start server.js --name "BotWhatsApp"
-        ```
-    * Untuk melihat QR code pertama kali, cek log:
-        ```bash
-        pm2 logs BotWhatsApp
-        ```
-    * Setelah memindai QR, hentikan log dengan `Ctrl + C`. Bot akan tetap berjalan di latar belakang.
-
----
-
-## ⚙️ Konfigurasi
-
-Sebelum menjalankan bot, buka file `server.js` dan isi semua konstanta di bagian **KONFIGURASI PENTING**:
-
-```javascript
-// --- KONFIGURASI PENTING (WAJIB DIISI!) ---
-const ADMIN_WID = '6281234567890@c.us'; // Ganti dengan nomor WhatsApp Anda
-const QRIS_IMAGE_URL = '[https://i.imgur.com/your-qris.jpg](https://i.imgur.com/your-qris.jpg)'; // Ganti dengan URL gambar QRIS
-const RAJAONGKIR_API_KEY = 'API_KEY_RAJAONGKIR_ANDA'; // Ganti dengan API Key RajaOngkir
-const SHOP_ORIGIN_SUBDISTRICT_ID = '2276'; // Ganti dengan ID Kecamatan asal pengiriman
-const GEMINI_API_KEY = 'API_KEY_GEMINI_ANDA'; // Ganti dengan API Key Google Gemini
-ADMIN_WID: Nomor WhatsApp Anda dalam format internasional, diakhiri dengan @c.us.GEMINI_API_KEY: Kunci API dari Google AI Studio.RAJAONGKIR_API_KEY: Kunci API dari situs RajaOngkir (bisa tipe Starter/Gratis).Anda juga bisa menambahkan produk awal dengan mengedit array products di dalam file db.json.▶️ Menjalankan BotSetelah instalasi dan konfigurasi selesai, jalankan bot dengan perintah:npm start
-Atau jika menggunakan PM2 di VPS:pm2 restart BotWhatsApp
-🤝 KontribusiKontribusi, isu, dan permintaan fitur sangat kami hargai! Jangan ragu untuk membuat pull request atau membuka issue baru.⚠️ DisclaimerProyek ini dibagikan untuk tujuan edukasi dan portofolio. Dilarang keras untuk menjual kembali, mengubah, atau mendistribusikan ulang kode ini dalam bentuk apapun tanpa izin tertulis dari pembuat asli, ALTOMEDIA.Segala bentuk penyalahgunaan atau pelanggaran terhadap ketentuan ini akan ditindaklanjuti.📜 LisensiProyek ini dilisensikan di bawah Lisensi MIT.</markdown>
+## ⚙️ Mengakses Panel AdminSetelah bot berjalan, Anda bisa mengakses panel admin melalui browser di:
+http://IP_ADDRESS_VPS_ANDA:3000Jika Anda sudah mengatur reverse proxy dengan Nginx/Caddy dan SSL, Anda bisa mengaksesnya melalui domain Anda:
+https://domain-anda.com
