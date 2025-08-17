@@ -132,11 +132,7 @@ Install PM2 & Nodemon:
 sudo npm install -g pm2 nodemon
 ```
 ## Jalankan Bot dengan PM2:
-Gunakan 
-```
-npm start
-```
- yang sudah dikonfigurasi di package.json untuk menjalankan server dengan nodemon melalui 
+Gunakan ```npm start``` yang sudah dikonfigurasi di package.json untuk menjalankan server dengan nodemon melalui 
 ```
 PM2.pm2 start "npm start" --name "1406bot"
 ```
