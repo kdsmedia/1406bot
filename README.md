@@ -83,9 +83,9 @@ Terima kasih kepada para sponsor yang telah mendukung proyek ini!
 ---
 
 ## 🛠️ PrasyaratSebelum memulai instalasi, pastikan sistem Anda telah terpasang perangkat lunak berikut:
--- Node.js (Versi 16 atau lebih tinggi)
--- Git (Untuk mengkloning repositori)
--- PM2 (Untuk menjalankan bot 24/7 di VPS)
+**Node.js (Versi 16 atau lebih tinggi)
+**Git (Untuk mengkloning repositori)
+**PM2 (Untuk menjalankan bot 24/7 di VPS)
 
 ## 📂 Struktur File ProyekStruktur proyek Anda yang benar akan terlihat seperti ini:
 ```
