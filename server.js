@@ -1,5 +1,5 @@
 // ================================================================= //
-//         BOT WHATSAPP & ADMIN PANEL V3.2 - AUTO WELCOME          //
+//         BOT WHATSAPP & ADMIN PANEL V3.5 - DETAILED LOGS         //
 // ================================================================= //
 
 // --- IMPORTS LIBRARY ---
@@ -14,7 +14,7 @@ const path = require('path');
 
 // --- PENGATURAN AWAL & PATH ---
 const DB_PATH = './db.json';
-const PORT = process.env.PORT || 369;
+const PORT = process.env.PORT || 3000;
 
 // --- INISIALISASI WEB SERVER & SOCKET.IO ---
 const app = express();
@@ -25,7 +25,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // --- INISIALISASI WHATSAPP & AI ---
 const client = new Client({
     authStrategy: new LocalAuth(),
-    puppeteer: { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
+    puppeteer: { 
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: '/usr/bin/google-chrome-stable' // Path untuk VPS Linux
+    }
 });
 
 let genAI, aiModel, rajaOngkir;
@@ -36,7 +39,7 @@ let genAI, aiModel, rajaOngkir;
 
 function getDefaultSettings() {
     return {
-        adminWID: ['6283872543697@c.us'],
+        adminWID: ['6285813899649@c.us', '6283872543697@c.us'],
         qrisImageURL: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHwO_-Mp4mmE5tIQgvrs8ZzsUiKwMWROUa8XAMFdKpYGzqxAXR9ciCYRZ9LBt-i1ukxzhTVQw_mcKbCm5jzFe6vySjmowjplpTMJBwV5HVfETSH6WwqlWHY2BEn_rMJn4jXXRX5ylMRwDGPssCFolj5akwy1Ny-Y3_JHFQZK3Jdf4HzaFwuBRXqwcDVhI/s407/qris.jpg',
         rajaongkirApiKey: 'gBFPpQZd9f94a0b3859a57deidGsYsCm',
         shopOriginSubdistrictId: '2276',
@@ -48,14 +51,17 @@ function getDefaultSettings() {
 
 function initializeApiClients(settings) {
     try {
-        genAI = new GoogleGenerativeAI(settings.geminiApiKey);
-        aiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-        rajaOngkir = axios.create({
-            baseURL: 'https://api.rajaongkir.com/starter',
-            headers: { 'key': settings.rajaongkirApiKey, 'Content-Type': 'application/x-www-form-urlencoded' }
-        });
-        console.log("✅ Klien API (Gemini & RajaOngkir) berhasil diinisialisasi.");
+        if (settings.geminiApiKey) {
+            genAI = new GoogleGenerativeAI(settings.geminiApiKey);
+            aiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        }
+        if (settings.rajaongkirApiKey) {
+            rajaOngkir = axios.create({
+                baseURL: 'https://api.rajaongkir.com/starter',
+                headers: { 'key': settings.rajaongkirApiKey, 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+        }
+        console.log("✅ Klien API berhasil diinisialisasi.");
     } catch (error) {
         console.error("❌ Gagal menginisialisasi Klien API. Periksa API Key Anda:", error.message);
     }
@@ -86,7 +92,6 @@ function writeDb(data) {
 
 let initialData = readDb();
 initializeApiClients(initialData.settings);
-writeDb(initialData);
 
 // ================================================================= //
 //                         FUNGSI PEMBANTU (HELPERS)                 //
@@ -96,73 +101,11 @@ function getUser(userId) {
     const db = readDb();
     if (!db.users || !db.users[userId]) {
         if (!db.users) db.users = {};
-        db.users[userId] = {
-            balance: 0, lastClaim: new Date(0).toISOString(), cart: [],
-            state: 'idle', address: null
-        };
+        db.users[userId] = { balance: 0, lastClaim: new Date(0).toISOString(), cart: [], state: 'idle', address: null };
         writeDb(db);
     }
     return db.users[userId];
 }
-
-function setUserState(userId, state, progressData = null) {
-    const db = readDb();
-    if (db.users[userId]) {
-        db.users[userId].state = state;
-        const progressKeys = ['addressFormProgress', 'checkoutProgress', 'confirmationProgress', 'generationProgress', 'productFormProgress'];
-        progressKeys.forEach(key => {
-            if(!['generationProgress', 'productFormProgress'].includes(key)) delete db.users[userId][key]
-        });
-        if (progressData) {
-            const key = Object.keys(progressData)[0];
-            db.users[userId][key] = progressData[key];
-        }
-        if (state === 'idle') {
-            delete db.users[userId].generationProgress;
-            delete db.users[userId].productFormProgress;
-        }
-        writeDb(db);
-    }
-}
-
-async function getGeminiResponse(prompt) {
-    try {
-        if (!aiModel) throw new Error("AI Model tidak terinisialisasi.");
-        const result = await aiModel.generateContent(prompt);
-        return result.response.text();
-    } catch (error) {
-        console.error("Gemini API Error:", error);
-        return "🤖 Maaf, AI sedang mengalami sedikit gangguan. Silakan coba lagi nanti.";
-    }
-}
-
-async function getShippingOptions(destinationSubdistrictId, weightInGrams) {
-    try {
-        if (!rajaOngkir) throw new Error("RajaOngkir tidak terinisialisasi.");
-        const db = readDb();
-        const response = await rajaOngkir.post('/cost', {
-            origin: db.settings.shopOriginSubdistrictId, originType: 'subdistrict',
-            destination: destinationSubdistrictId, destinationType: 'subdistrict',
-            weight: weightInGrams, courier: 'jne:tiki:sicepat'
-        });
-        const results = response.data.rajaongkir.results;
-        let options = [];
-        for (const courier of results) {
-            for (const service of courier.costs) {
-                options.push({
-                    id: `ship_${courier.code.toUpperCase()}_${service.service}_${service.cost[0].value}`,
-                    title: `${courier.code.toUpperCase()} - ${service.service}`,
-                    description: `Rp ${service.cost[0].value.toLocaleString('id-ID')} (est. ${service.cost[0].etd} hari)`
-                });
-            }
-        }
-        return options;
-    } catch (error) {
-        console.error("RajaOngkir API Error:", error.response ? error.response.data : error.message);
-        return [];
-    }
-}
-
 
 // ================================================================= //
 //                         KONEKSI SOCKET.IO                         //
@@ -181,27 +124,14 @@ io.on('connection', (socket) => {
         socket.emit('settings_saved', { message: 'Pengaturan disimpan! Bot akan restart...' });
 
         console.log('Server akan restart dalam 2 detik untuk menerapkan perubahan...');
-        setTimeout(() => {
-            process.exit(0);
-        }, 2000);
+        setTimeout(() => { process.exit(0); }, 2000);
     });
 
-    socket.on('approve_withdrawal', async (data) => {
-        console.log(`Menerima permintaan approve untuk WD ID: ${data.id}`);
-        await handleApproveCmd(null, `!approve ${data.id}`);
-    });
-
-    socket.on('reject_withdrawal', async (data) => {
-        console.log(`Menerima permintaan reject untuk WD ID: ${data.id}`);
-        await handleRejectCmd(null, `!reject ${data.id} ${data.reason}`);
-    });
-    
+    socket.on('approve_withdrawal', async (data) => { await handleApproveCmd(null, `!approve ${data.id}`); });
+    socket.on('reject_withdrawal', async (data) => { await handleRejectCmd(null, `!reject ${data.id} ${data.reason}`); });
     socket.on('add_product', (productData) => {
         const db = readDb();
-        const newProduct = {
-            id: `PROD${Date.now()}`,
-            ...productData
-        };
+        const newProduct = { id: `PROD${Date.now()}`, ...productData };
         if (!db.products) db.products = [];
         db.products.push(newProduct);
         writeDb(db);
@@ -209,47 +139,51 @@ io.on('connection', (socket) => {
         socket.emit('settings_saved', { message: 'Produk berhasil ditambahkan!' });
     });
 
-    socket.on('disconnect', () => {
-        console.log('🔌 Admin Panel terputus.');
-    });
+    socket.on('disconnect', () => { console.log('🔌 Admin Panel terputus.'); });
 });
 
-
 // ================================================================= //
-//                         FUNGSI FITUR BOT                          //
+//                         FUNGSI FITUR BOT (LENGKAP)                //
 // ================================================================= //
 
 async function handleStart(chatId) {
-    const mainRows = [
-        { id: 'cmd_katalog', title: '🛍️ Lihat Katalog Produk' },
-        { id: 'cmd_profil', title: '👤 Profil Saya', description: 'Lihat saldo, klaim bonus, dan lainnya.' },
-        { id: 'cmd_riwayat', title: '📜 Riwayat Transaksi' },
-        { id: 'cmd_generator', title: '✨ AI Content Generator' },
-    ];
-    const sections = [{ title: 'Menu Utama', rows: mainRows }];
-    const list = new List('👋 *Selamat Datang di Bot Canggih!*\nSaya adalah ALTO, asisten virtual Anda. Silakan pilih menu di bawah ini atau ketik *!start* untuk melihat menu ini lagi.', 'Buka Menu', sections, 'Menu Utama', 'ALTOS Bot');
+    const list = new List(
+        '👋 *Selamat Datang di Bot Canggih!*\n\nSaya adalah asisten virtual Anda. Silakan pilih menu di bawah ini atau ketik *!start* untuk melihat menu ini lagi.', 
+        'Buka Menu', 
+        [{ title: 'Menu Utama', rows: [
+            { id: 'cmd_katalog', title: '🛍️ Lihat Katalog' },
+            { id: 'cmd_profil', title: '👤 Profil Saya' }
+        ]}],
+        'Menu Utama'
+    );
     await client.sendMessage(chatId, list);
 }
 
 async function sendProfileMenu(chatId) {
-    const profileRows = [
-        { id: 'cmd_saldo', title: '💰 Cek Saldo Bonus' },
-        { id: 'cmd_klaim', title: '🎁 Klaim Bonus Harian' },
-        { id: 'cmd_withdraw', title: '💸 Tarik Saldo' },
-        { id: 'cmd_start', title: '⬅️ Kembali ke Menu Utama' },
-    ];
-    const sections = [{ title: 'Menu Profil', rows: profileRows }];
-    const list = new List('Silakan pilih salah satu opsi di bawah ini untuk mengelola profil dan saldo Anda.', 'Buka Profil', sections, 'Profil Saya');
+    const list = new List(
+        'Silakan pilih salah satu opsi di bawah ini untuk mengelola profil dan saldo Anda.',
+        'Buka Profil',
+        [{ title: 'Menu Profil', rows: [
+            { id: 'cmd_saldo', title: '💰 Cek Saldo Bonus' },
+            { id: 'cmd_klaim', title: '🎁 Klaim Bonus Harian' },
+            { id: 'cmd_withdraw', title: '💸 Tarik Saldo' },
+            { id: 'cmd_start', title: '⬅️ Kembali' },
+        ]}],
+        'Profil Saya'
+    );
     await client.sendMessage(chatId, list);
 }
 
 async function sendAdminMenu(chatId) {
-    const adminRows = [
-        { id: 'cmd_tambahproduk', title: '📦 Tambah Produk Baru', description: 'Memulai alur untuk menambahkan produk ke katalog.' },
-        { id: 'cmd_start', title: '⬅️ Kembali ke Menu Utama', description: 'Kembali ke menu pengguna biasa.' },
-    ];
-    const sections = [{ title: 'Menu Khusus Admin', rows: adminRows }];
-    const list = new List('👑 *Selamat Datang, Admin!*\nSilakan pilih salah satu perintah di bawah ini untuk mengelola bot.', 'Buka Menu Admin', sections, 'Menu Admin');
+    const list = new List(
+        '👑 *Selamat Datang, Admin!*\nSilakan pilih salah satu perintah di bawah ini untuk mengelola bot.',
+        'Buka Menu Admin',
+        [{ title: 'Menu Khusus Admin', rows: [
+            { id: 'cmd_tambahproduk', title: '📦 Tambah Produk Baru' },
+            { id: 'cmd_start', title: '⬅️ Kembali ke Menu Utama' },
+        ]}],
+        'Menu Admin'
+    );
     await client.sendMessage(chatId, list);
 }
 
@@ -374,86 +308,108 @@ async function handleRejectCmd(adminChatId, messageBody) {
 }
 
 // ================================================================= //
-//                      INISIALISASI & EVENT LISTENER                //
+//                      INISIALISASI & EVENT LISTENER (DIPERBARUI)   //
 // ================================================================= //
 
 server.listen(PORT, () => {
     console.log(`🚀 Server Admin Panel berjalan di http://localhost:${PORT}`);
-    console.log("Menginisialisasi Bot WhatsApp...");
+    console.log("===================================================");
+    console.log("⏳ Menginisialisasi Bot WhatsApp...");
     client.initialize();
 });
 
+client.on('loading_screen', (percent, message) => {
+    console.log(`[PROSES] Memuat: ${percent}% - ${message}`);
+});
+
 client.on('qr', qr => {
+    console.log("[PROSES] QR Code diterima, silakan pindai.");
     require('qrcode-terminal').generate(qr, { small: true });
     console.log('Pindai QR Code ini dengan aplikasi WhatsApp Anda.');
 });
 
+client.on('authenticated', () => {
+    console.log('[PROSES] Autentikasi berhasil!');
+});
+
 client.on('ready', () => {
+    console.log("===================================================");
     console.log('✅ Bot berhasil terhubung dan siap digunakan!');
+    console.log("===================================================");
 });
 
 client.on('auth_failure', msg => {
-    console.error('GAGAL AUTENTIKASI', msg);
+    console.error('❌ GAGAL AUTENTIKASI:', msg);
 });
 
-client.on('message', async message => {
-    const text = message.body;
-    const chatId = message.from;
-    const chat = await message.getChat(); // Mendapatkan info chat
-    const db = readDb();
-    const settings = db.settings;
-    const ADMIN_WID = settings.adminWID;
-    const isAdmin = ADMIN_WID.includes(chatId);
-    const user = getUser(chatId);
+client.on('disconnected', (reason) => {
+    console.log('🔌 Bot terputus:', reason);
+});
 
-    if (text.toLowerCase() === '!batal' && user.state !== 'idle') {
-        setUserState(chatId, 'idle');
-        await client.sendMessage(chatId, "👍 Proses dibatalkan.");
-        return;
-    }
+// ================================================================= //
+//                      ROUTER PESAN UTAMA (STABIL)                  //
+// ================================================================= //
 
-    if (user.state !== 'idle') {
-        // Logika state machine (jika ada) akan ditangani di sini
-        return;
-    }
-    
-    if (text.startsWith('!')) {
-        const command = text.toLowerCase().split(' ')[0];
+client.on('message', async (message) => {
+    try {
+        if (!message.body || message.isStatus) return;
+
+        const text = message.body.trim();
+        const chatId = message.from;
+        const chat = await message.getChat();
         
-        switch (command) {
-            case '!start': await handleStart(chatId); return;
-            case '!profil': await sendProfileMenu(chatId); return;
-            case '!saldo': await handleSaldoCmd(chatId); return;
-            case '!klaim': await handleClaimBonusCmd(chatId); return;
-            case '!withdraw': await handleWithdrawCmd(chatId, text); return;
-        }
+        console.log(`[PESAN] Dari: ${chatId} | Grup: ${chat.isGroup} | Isi: "${text}"`);
 
-        if (isAdmin) {
+        const db = readDb();
+        const isAdmin = db.settings.adminWID.includes(chatId);
+        
+        let commandHandled = false;
+        const lowerCaseText = text.toLowerCase();
+
+        // Router untuk perintah List (cmd_)
+        if (lowerCaseText.startsWith('cmd_')) {
+            commandHandled = true;
+            const command = lowerCaseText.split('_')[1];
             switch (command) {
-                case '!admin': await sendAdminMenu(chatId); return;
-                case '!approve': await handleApproveCmd(chatId, text); return;
-                case '!reject': await handleRejectCmd(chatId, text); return;
+                case 'start': await handleStart(chatId); break;
+                case 'profil': await sendProfileMenu(chatId); break;
+                case 'saldo': await handleSaldoCmd(chatId); break;
+                case 'klaim': await handleClaimBonusCmd(chatId); break;
+                case 'withdraw': await handleWithdrawCmd(chatId, text); break;
+                default: console.log(`Perintah cmd tidak dikenal: ${command}`);
             }
         }
-        // Jika perintah '!' tidak dikenali, akan lanjut ke bawah
-    }
-    
-    if (text.startsWith('cmd_')) {
-        const command = text.split('_')[1];
-        switch (command) {
-            case 'start': await handleStart(chatId); break;
-            case 'profil': await sendProfileMenu(chatId); break;
-            case 'saldo': await handleSaldoCmd(chatId); break;
-            case 'klaim': await handleClaimBonusCmd(chatId); break;
-            case 'withdraw': await handleWithdrawCmd(chatId, text); break;
+        // Router untuk perintah ketik (!)
+        else if (lowerCaseText.startsWith('!')) {
+            commandHandled = true;
+            const command = lowerCaseText.split(' ')[0];
+            switch (command) {
+                case '!start': await handleStart(chatId); break;
+                case '!profil': await sendProfileMenu(chatId); break;
+                case '!saldo': await handleSaldoCmd(chatId); break;
+                case '!klaim': await handleClaimBonusCmd(chatId); break;
+                case '!withdraw': await handleWithdrawCmd(chatId, text); break;
+                default: 
+                    if (!isAdmin) {
+                         await client.sendMessage(chatId, "Maaf, perintah tidak dikenali. Ketik *!start* untuk melihat menu.");
+                    }
+            }
+            if (isAdmin) {
+                 switch (command) {
+                    case '!admin': await sendAdminMenu(chatId); break;
+                    case '!approve': await handleApproveCmd(chatId, text); break;
+                    case '!reject': await handleRejectCmd(chatId, text); break;
+                 }
+            }
         }
-        return; // Setelah memproses cmd, hentikan eksekusi
-    }
 
-    // --- PERUBAHAN DI SINI ---
-    // Jika pesan dikirim di chat pribadi (bukan grup) dan tidak ada 
-    // perintah yang cocok di atas, kirimkan menu utama sebagai sambutan.
-    if (!chat.isGroup) {
-        await handleStart(chatId);
+        // Fallback: Jika bukan perintah dan bukan dari grup, kirim menu sambutan
+        if (!commandHandled && !chat.isGroup) {
+            console.log(`[FALLBACK] Mengirim menu sambutan ke ${chatId}.`);
+            await handleStart(chatId);
+        }
+
+    } catch (error) {
+        console.error("[ERROR UTAMA]:", error);
     }
 });
