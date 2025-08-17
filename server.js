@@ -4,7 +4,7 @@
 
 // --- IMPORTS LIBRARY ---
 const fs = require('fs');
-const { Client, LocalAuth, MessageMedia, List } = require('whatsapp-web.js'); 
+const { Client, LocalAuth, MessageMedia, List } = require('whatsapp-web.js');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const axios = require('axios');
 
@@ -47,8 +47,7 @@ function getUser(userId) {
         if (!db.users) db.users = {};
         db.users[userId] = {
             balance: 0, lastClaim: new Date(0).toISOString(), cart: [],
-            state: 'idle', address: null,
-            isNew: true
+            state: 'idle', address: null
         };
         writeDb(db);
     }
@@ -150,11 +149,9 @@ async function sendProfileMenu(chatId) {
     await client.sendMessage(chatId, list);
 }
 
-// --- DITAMBAHKAN: Menu Khusus Admin ---
 async function sendAdminMenu(chatId) {
     const adminRows = [
         { id: 'cmd_tambahproduk', title: '📦 Tambah Produk Baru', description: 'Memulai alur untuk menambahkan produk ke katalog.' },
-        // Tambahkan perintah admin lain di sini jika perlu
         { id: 'cmd_start', title: '⬅️ Kembali ke Menu Utama', description: 'Kembali ke menu pengguna biasa.' },
     ];
 
@@ -562,14 +559,6 @@ client.on('message', async message => {
     const chat = await message.getChat();
     const isAdmin = ADMIN_WID.includes(chatId);
 
-    if (user.isNew && !chat.isGroup) {
-        const db = readDb();
-        db.users[chatId].isNew = false;
-        writeDb(db);
-        await handleStart(chatId);
-        return;
-    }
-
     if (text.toLowerCase() === '!batal' && user.state !== 'idle') {
         setUserState(chatId, 'idle');
         await client.sendMessage(chatId, "👍 Proses dibatalkan.");
@@ -674,9 +663,8 @@ client.on('message', async message => {
 
     if (text.startsWith('pay_') || text.startsWith('ship_')) { /* ... */ return; }
 
+    // --- DIUBAH: Fallback ke Menu Utama, bukan Chatbot ---
     if (!chat.isGroup) {
-        await client.sendMessage(chatId, "🤖 ALTO lagi mikir...");
-        const geminiResponse = await getGeminiResponse(text);
-        await client.sendMessage(chatId, geminiResponse);
+        await handleStart(chatId);
     }
 });
